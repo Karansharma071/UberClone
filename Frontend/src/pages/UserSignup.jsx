@@ -1,23 +1,49 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { UserContext } from '../context/UserContext'
 
 const UserSignup = () => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [userData, setUserData] = useState({})
-  const submitHandler = (e) => {
+  // const [userData, setUserData] = useState({})
+  const { user, setUser } = React.useContext(UserContext)
+  console.log('user', user)
+
+  const navigate = useNavigate()
+
+  const submitHandler = async (e) => {
     e.preventDefault()
-    setUserData({
-      fullName: {
-        firstName: firstName,
-        lastName: lastName,
+    const newUser = {
+      fullname: {
+        firstname: firstName,
+        lastname: lastName,
       },
       email: email,
       password: password,
-    })
-    console.log(firstName, lastName, email, password, userData)
+    }
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/register`,
+        newUser
+      )
+
+      if (response.status === 201) {
+        const data = response.data
+        setUser(data.user)
+        localStorage.setItem('token', JSON.stringify(data.token))
+        navigate('/login')
+      }
+      console.log(response)
+    } catch (error) {
+      console.log(error)
+    }
+
+    console.log(firstName, lastName, email, password)
     setFirstName('')
     setLastName('')
     setEmail('')
@@ -72,7 +98,7 @@ const UserSignup = () => {
             placeholder="Enter Password"
           />
           <button className="bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2  w-full text-lg placeholder:text-base ">
-            Signup
+            Sign up
           </button>
           <p className="text-center">
             Alredy have an account?
