@@ -19,7 +19,7 @@ const UserLogin = () => {
         {
           email: email,
           password: password,
-        }
+        },
       )
 
       if (response.status === 200) {
